@@ -21,6 +21,7 @@ public class TestTreeGenerator : MonoBehaviour
     {
         myTerrain = Terrain.activeTerrain;
         myTerrainData = Terrain.activeTerrain.terrainData;
+        List<TreeInstance> treeList = new List<TreeInstance>();
         //go through myColors[], if pixel is green, instantiate a bush
         // note: myColors is a 2D array and the index corresponds to the piposition of the pixel in the texture
 
@@ -48,15 +49,26 @@ public class TestTreeGenerator : MonoBehaviour
                     float z = myTerrain.GetPosition().z + k + 0.5f;
                     float y = myTerrain.SampleHeight(new Vector3(x, myTerrainData.GetHeight((int)x, (int)z), z));
                     Vector3 p = new Vector3(x, y, z);
-                    GenerateTree(resprouterPrefab, p);
+                    TreeInstance tree = new TreeInstance();
+                    tree.position = p;
+                    treeList.Add(tree);
+                    myTerrain.AddTreeInstance(tree);
+                    //GenerateTree(resprouterPrefab, p);
                 }
             }
         }
+
+        //myTerrainData.treeInstances = treeList.ToArray();
+        
+        //foreach (TreeInstance t in myTerrainData.treeInstances)
+        //{
+        //   Debug.Log(t);
+        //}
     }
-    private GameObject GenerateTree(GameObject treePrefab, Vector3 p)
-    {
-        return GameObject.Instantiate(treePrefab, p, Quaternion.identity);
-    }
+    //private GameObject GenerateTree(GameObject treePrefab, Vector3 p)
+    //{
+    //    return GameObject.Instantiate(treePrefab, p, Quaternion.identity);
+    //}
 
 }
 
