@@ -1,59 +1,53 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq; //for finding min
 using UnityEngine;
 using System.IO;
 
 public class Size : MonoBehaviour
 {
-    private float size;
-    //tracks current line in textfile
-    private int index;
-    //How long to wait before retrieving next line of input
-    [SerializeField] private float growthTime = 1;
-    [SerializeField] private string fileName;
+    private int index = 1;   // use to index my sizes list
+    [SerializeField] private float growthTime = 1;    // how long to pause before reading the next value in sizes
+    public string fileName;
+    public List<float> sizes = new List<float>();
 
-    //private float[] sizes;
-    private double[] sizes;
-    private List<Transform> trees = new List<Transform>(0);
-   
+    Terrain myTerrain;
 
     private void Start()
     {
-        // creates array of string sizes
-        string[] sSizes = GameFunctions.ReadFile(fileName);
-        //sizes = new float[sSizes.Length];
-        sizes = new double[sSizes.Length];
-
-        //stores array of string sizes in our member variable sizes
-        for (int i = 0; i < sSizes.Length; i++)
-        {
-            //sizes[i] = float.Parse(sSizes[i]);
-            Debug.Log("storing sizes: " + sizes[index]);
-            sizes[i] = double.Parse(sSizes[i]) ; 
-        }
-
-        index = 0;
+        myTerrain = Terrain.activeTerrain;
+        //StartCoroutine(WaitThenChangeSize(10));
+        sizes = GameFunctions.Read(fileName, "biomass");
+        Debug.Log("Read sizes size is " + sizes.Count);
         StartCoroutine(WaitThenChangeSize(0));
     }
 
-IEnumerator WaitThenChangeSize(float time)
+    IEnumerator WaitThenChangeSize(float time)
     {
         yield return new WaitForSeconds(time);
-        foreach (Transform t in trees)
-        {
-            Debug.Log("new scaling size: " + sizes[index]);
-            t.localScale = Vector3.one * (float) sizes[index];
-        }
-        
-        index++;
-        if (index<sizes.Length)
-        {
-            StartCoroutine(WaitThenChangeSize(growthTime));
-        }
 
+
+        for (int i = 1; i < myTerrain.terrainData.treeInstances.Length; i++)
+        {
+            TreeInstance t = myTerrain.terrainData.GetTreeInstance(i);
+            float percentage = (sizes[index] - sizes[index - 1]) / sizes[index - 1];
+            float x = myTerrain.terrainData.GetTreeInstance(i - 1).heightScale * (1 + percentage);
+            //t.heightScale =  (sizes[index] / 1000f);
+            //t.widthScale = (sizes[index] / 1000f);
+            t.heightScale = x;
+            t.widthScale = x;
+
+            myTerrain.terrainData.SetTreeInstance(i, t);
+
+            Debug.Log("scale size is now: " + t.heightScale);
+        }
+        index++;
+
+        if (index >= sizes.Count - 1)
+        {
+            Debug.Break();
+        }
+        StartCoroutine(WaitThenChangeSize(growthTime));
     }
-    public void AddTree(Transform t)
-    {
-        trees.Add(t);
-    }
+
 }

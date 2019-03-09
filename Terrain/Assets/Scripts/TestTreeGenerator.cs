@@ -1,16 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//generate 10 resprouters and seeders at random location of terrain
+using System.Linq;
 public class TestTreeGenerator : MonoBehaviour
 {
-
-    [SerializeField] public GameObject resprouterPrefab;
-    [SerializeField] public GameObject seederPrefab;
-    [SerializeField] private Size rs;
-    [SerializeField] private Size ss;
-    //[SerializeField] private int numberOfResprouters = 15;
-    //[SerializeField] private int numberOfSeeder = 15;
 
     public Texture2D myTexture;
     private Terrain myTerrain;
@@ -21,7 +14,7 @@ public class TestTreeGenerator : MonoBehaviour
     {
         myTerrain = Terrain.activeTerrain;
         myTerrainData = Terrain.activeTerrain.terrainData;
-        List<TreeInstance> treeList = new List<TreeInstance>();
+        
         //go through myColors[], if pixel is green, instantiate a bush
         // note: myColors is a 2D array and the index corresponds to the piposition of the pixel in the texture
 
@@ -35,42 +28,44 @@ public class TestTreeGenerator : MonoBehaviour
         {
             for (int k = 0; k < width; k++)
             {
-                //Color c = gameObject.GetComponent<color>().myColors[j][k];
-
                 Color c = myTexture.GetPixel(j, k);
+                string f = "false";
 
-                if (gameObject.GetComponent<color>().IsSameColor(c, green))
+
+                Debug.Log("this color is green:" + f);
+                Debug.Log("compared colors");
+                if (myTerrain.GetComponent<color>().IsSameColor(c, green))
                 {
-                    // j = x position, k = z position, GetHeight = y position
-                    // the 0.5 is to place the bush exactly in the middle of the square
-                    //one bush takes up one square in Unity
+                    f = "true";
+                    Debug.Log("in add tree loop");
+                    addTreeToTerrain(j, k);
+                    myTerrain.Flush();
 
-                    float x = myTerrain.GetPosition().x + j + 0.5f;
-                    float z = myTerrain.GetPosition().z + k + 0.5f;
-                    float y = myTerrain.SampleHeight(new Vector3(x, myTerrainData.GetHeight((int)x, (int)z), z));
-                    Vector3 p = new Vector3(x, y, z);
-                    TreeInstance tree = new TreeInstance();
-                    tree.position = p;
-                    treeList.Add(tree);
-                    myTerrain.AddTreeInstance(tree);
-                    //GenerateTree(resprouterPrefab, p);
                 }
+                Debug.Log("this color is green:" + f);
             }
         }
-
-        //myTerrainData.treeInstances = treeList.ToArray();
-        
-        //foreach (TreeInstance t in myTerrainData.treeInstances)
-        //{
-        //   Debug.Log(t);
-        //}
     }
-    //private GameObject GenerateTree(GameObject treePrefab, Vector3 p)
-    //{
-    //    return GameObject.Instantiate(treePrefab, p, Quaternion.identity);
-    //}
 
+    void addTreeToTerrain(int j, int k)
+    {
+        Vector3 p = (new Vector3((float)j / (float)myTexture.height, 0, (float)k / (float)myTexture.width));
+        Debug.Log(p);
+        TreeInstance tree = new TreeInstance();
+        tree.prototypeIndex = 0;
+        tree.position = p;
+        float x = gameObject.GetComponent<Size>().sizes[0];
+        float max = gameObject.GetComponent<Size>().sizes.Max();
+        x = x * 2.25f / max; //x is heightScale for first tree
+        tree.heightScale = x;
+        tree.widthScale = x;
+        tree.color = Color.white;
+        tree.lightmapColor = Color.white;
+
+        myTerrain.AddTreeInstance(tree);
+    }
 }
+
 
 
 //idea: store all clumps of bushes
