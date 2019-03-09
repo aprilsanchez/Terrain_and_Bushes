@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fd70b730a005b6546a39e2e4a16eb8df
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - resprouterPrefab: {fileID: 1408205557243038, guid: bc9b7712802c32b409712d4567f5e38c,
+      type: 3}
+  - seederPrefab: {fileID: 1408205557243038, guid: bc9b7712802c32b409712d4567f5e38c,
+      type: 3}
+  - rs: {instanceID: 0}
+  - ss: {instanceID: 0}
+  - myTexture: {fileID: 2800000, guid: 56aabc2e231f1604c9afa730dede0de4, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
